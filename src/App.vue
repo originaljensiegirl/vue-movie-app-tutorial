@@ -1,31 +1,76 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+  <v-app class="app">
+    <v-content>
+      <v-layout justify-center row wrap fill-height>
+        <v-flex xs12 md4 pa-4>
+          <h2>My Top Rated Movies</h2>
+          <ul>
+            <li v-for="(m, index) in favoriteMovies" :key="index">{{m.title}}</li>
+          </ul>
+        </v-flex>
+        <v-flex xs12 md8 pa-4 fill-height>
+          <v-layout justify-left row wrap class="fill-height">
+            <v-flex xs12>
+              <h1>My Movies</h1>
+            </v-flex>
+            <v-flex xs6 sm4 md4 lg3 xl3 pa-2 v-for="(m, index) in movies" :key="index">
+              <v-card class="fill-height">
+                <v-img :src="m.img"/>
+                <v-card-title>
+                  <h2 class="subtitle-1">{{m.title}}</h2>
+                </v-card-title>
+                <v-card-text>
+                  <v-rating small v-model="m.rating"></v-rating>
+                  {{`${m.rating}/5`}}
+                </v-card-text>
+              </v-card>
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-content>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+<style scoped>
+.app {
+  padding: 1em;
 }
 </style>
+
+<script>
+import * as axios from "axios";
+
+export default {
+  name: "App",
+  data: () => ({
+    movies: []
+  }),
+  methods: {
+    getAllMovies: async function() {
+      const url = "https://movie-api-test-page.herokuapp.com/api/movies";
+      var res = [];
+      await axios
+        .get(url)
+        .then(function(data) {
+          res = data.data;
+        })
+        .catch(function(err) {
+          // eslint-disable-next-line
+          console.log(err);
+        });
+      return res;
+    }
+  },
+  async created() {
+    this.movies = await this.getAllMovies();
+  },
+  computed: {
+    favoriteMovies: function() {
+      return this.movies.filter(x => {
+        return x.rating > 4;
+      });
+    }
+  }
+};
+</script>
