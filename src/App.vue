@@ -14,16 +14,7 @@
               <h1>My Movies</h1>
             </v-flex>
             <v-flex xs6 sm4 md4 lg3 xl3 pa-2 v-for="(m, index) in movies" :key="index">
-              <v-card class="fill-height">
-                <v-img :src="m.img"/>
-                <v-card-title>
-                  <h2 class="subtitle-1">{{m.title}}</h2>
-                </v-card-title>
-                <v-card-text>
-                  <v-rating small v-model="m.rating"></v-rating>
-                  {{`${m.rating}/5`}}
-                </v-card-text>
-              </v-card>
+              <MovieCard @change-rating="m.rating=$event" :movie="m"></MovieCard>
             </v-flex>
           </v-layout>
         </v-flex>
@@ -40,12 +31,16 @@
 
 <script>
 import * as axios from "axios";
+import MovieCard from "./components/MovieCard";
 
 export default {
   name: "App",
   data: () => ({
     movies: []
   }),
+  components: {
+    MovieCard
+  },
   methods: {
     getAllMovies: async function() {
       const url = "https://movie-api-test-page.herokuapp.com/api/movies";
